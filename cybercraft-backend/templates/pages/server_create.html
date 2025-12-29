@@ -1,0 +1,108 @@
+{% extends "base.html" %} {% block title %}Create Server{% endblock %} {% block content %}
+
+<h1>Create Server</h1>
+
+<form id="createForm" onsubmit="return false;">
+  {% csrf_token %}
+  <div class="mb-3">
+    <label class="form-label">Name:</label>
+    <input
+      class="form-control"
+      type="text"
+      name="name"
+      id="input_name"
+      required
+    />
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Version:</label>
+    <select
+      class="form-select"
+      name="version"
+      id="version_select"
+      required
+    ></select>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Server Type:</label>
+    <select
+      class="form-select"
+      name="server_type"
+      id="server_type"
+      onchange="loadVersions()"
+    >
+      <option value="vanilla">Vanilla</option>
+      <option value="paper">Paper</option>
+      <option value="purpur">Purpur</option>
+      <option value="fabric">Fabric</option>
+      <option value="folia">Folia</option>
+      <option value="forge-installer">Forge Installer</option>
+      <option value="neoforge-installer">NeoForge Installer</option>
+    </select>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">RAM (MB):</label>
+    <input class="form-control" type="number" name="ram" value="1024" />
+  </div>
+
+  <button class="btn btn-success" type="button" onclick="startCreate()">
+    Create
+  </button>
+  <a class="btn btn-secondary" href="{% url 'server-list' %}">Back</a>
+</form>
+
+<script>
+  function getCookie(name) {
+    const v = document.cookie.match("(^|;)\\s*" + name + "\\s*=\\s*([^;]+)");
+    return v ? v.pop() : "";
+  }
+  const CSRF = getCookie("csrftoken");
+
+  async function loadVersions() {
+    const type = document.getElementById("server_type").value;
+    const sel = document.getElementById("version_select");
+
+    sel.innerHTML = "<option>Loading...</option>";
+
+    const res = await fetch(`/servers/arcadia/versions/?type=${type}`);
+    const d = await res.json();
+
+    sel.innerHTML = "";
+    d.versions.forEach((v) => {
+      const o = document.createElement("option");
+      o.value = v;
+      o.textContent = v;
+      sel.appendChild(o);
+    });
+  }
+  document.addEventListener("DOMContentLoaded", loadVersions);
+
+  async function startCreate() {
+    const form = document.getElementById("createForm");
+    const fd = new FormData(form);
+    const data = Object.fromEntries(fd.entries());
+
+    const res = await fetch("/servers/create-async/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": CSRF,
+      },
+      body: JSON.stringify(data),
+    });
+
+    const r = await res.json();
+
+    if (r.error) {
+      alert(r.error);
+      return;
+    }
+
+    window.location.href = `/servers/${r.server_id}/`;
+  }
+</script>
+
+{% endblock %}

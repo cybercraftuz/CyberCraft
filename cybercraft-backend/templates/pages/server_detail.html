@@ -1,0 +1,100 @@
+<h2>{{ server.name }}</h2>
+
+<p>
+  Version: {{ server.version }} | Status:
+  <strong id="statusText">
+    {% if server.is_running %}Running{% else %}Stopped{% endif %}
+  </strong>
+</p>
+
+<div style="margin-bottom: 10px">
+  <button id="startBtn" {% if server.is_running %}disabled{% endif %}>
+    ▶ Start
+  </button>
+  <button id="stopBtn" {% if not server.is_running %}disabled{% endif %}>
+    ⏹ Stop
+  </button>
+</div>
+
+<div
+  id="logBox"
+  style="
+    background: #111;
+    height: 400px;
+    overflow: auto;
+    font-family: monospace;
+    padding: 10px;
+    border-radius: 6px;
+  "
+></div>
+
+<script>
+  const logBox = document.getElementById("logBox");
+  const statusText = document.getElementById("statusText");
+  const startBtn = document.getElementById("startBtn");
+  const stopBtn = document.getElementById("stopBtn");
+
+  function appendLog(line) {
+    const div = document.createElement("div");
+
+    if (line.startsWith("[Error]")) div.style.color = "#ff4d4d";
+    else if (line.startsWith("[Installer]")) div.style.color = "#c084fc";
+    else if (line.startsWith("[Download]")) div.style.color = "#facc15";
+    else if (line.startsWith("[Server]")) div.style.color = "#22c55e";
+    else if (line.startsWith("[Whitelist]")) div.style.color = "#60a5fa";
+    else if (line.startsWith("[Ops]")) div.style.color = "#38bdf8";
+    else div.style.color = "#e5e7eb";
+
+    div.textContent = line;
+    logBox.appendChild(div);
+    logBox.scrollTop = logBox.scrollHeight;
+  }
+
+  fetch("/servers/{{ server.id }}/logs/")
+    .then((r) => r.json())
+    .then((data) => {
+      if (data.logs) {
+        data.logs.forEach((line) => appendLog(line));
+      }
+    })
+    .catch(() => {
+      appendLog("[Error] Failed to load log history");
+    });
+
+  const ws = new WebSocket(
+    "ws://" + location.host + "/ws/progress/{{ server.id }}/"
+  );
+
+  ws.onmessage = (e) => {
+    const data = JSON.parse(e.data);
+    if (data.log) appendLog(data.log);
+  };
+
+  ws.onerror = () => {
+    appendLog("[Error] WebSocket connection error");
+  };
+
+  startBtn.onclick = async () => {
+    const r = await fetch("/servers/{{ server.id }}/start/", {
+      method: "POST",
+    });
+    const d = await r.json();
+    if (d.error) return alert(d.error);
+
+    statusText.textContent = "Running";
+    startBtn.disabled = true;
+    stopBtn.disabled = false;
+  };
+
+  stopBtn.onclick = async () => {
+    const r = await fetch("/servers/{{ server.id }}/stop/", {
+      method: "POST",
+    });
+    const d = await r.json();
+    if (d.error) return alert(d.error);
+
+    statusText.textContent = "Stopped";
+    startBtn.disabled = false;
+    stopBtn.disabled = true;
+  };
+</script>

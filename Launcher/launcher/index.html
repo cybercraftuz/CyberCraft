@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CyberCraft Launcher</title>
+    <link rel="stylesheet" href="assets/style/styles.css" />
+    <link rel="stylesheet" href="assets/style/scrol.css" />
+    <link
+      rel="stylesheet"
+      href="http://fonts.googleapis.com/css?family=Audiowide"
+    />
+    <link
+      rel="stylesheet"
+      href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.css"
+      integrity="sha512-GmZYQ9SKTnOea030Tbiat0Y+jhnYLIpsGAe6QTnToi8hI2nNbVMETHeK4wm4MuYMQdrc38x+sX77+kVD01eNsQ=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+  </head>
+  <body>
+    <div class="window">
+      <header
+        class="header"
+        ondblclick="event.preventDefault()"
+        style="-webkit-app-region: drag"
+      >
+        <div class="logo_box">
+          <img src="assets/Logo/logo1.png" alt="logo1" class="logo_img" />
+          <span class="logo_title">
+            CyberCraft
+            <div class="player_count">
+              <span class="online_player" style="font-size: 10px">100</span>ta
+              o'yinchi siz bilan birga
+            </div>
+          </span>
+        </div>
+        <ul class="header-auth_list" style="-webkit-app-region: no-drag">
+          <div class="profile_info-item">
+            <button id="profileToggleBtn"></button>
+          </div>
+          <li class="auth_list-item" id="signInBtn">
+            <span class="item_text" id="registerBtn">Ro'yxatdan o'tish</span>
+          </li>
+          <li class="auth_list-item">
+            <span class="item_text" id="settingsBtn">Sozlamalar</span>
+          </li>
+          <div class="max-min">
+            <button class="btn-close" onclick="minimizeApp()">
+              <i class="fa-solid fa-minus"></i>
+            </button>
+            <button onclick="window.close()">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+        </ul>
+      </header>
+
+      <div class="divider"></div>
+
+      <div class="main">
+        <section class="main_bar" id="serverMainSection">
+          <div class="mod_list_bar_header" id="serverHeader"></div>
+          <div class="scrolbar" id="serverBody"></div>
+        </section>
+
+        <div class="login_box" id="login_box">
+          <div class="input_box">
+            <input type="text" id="username" placeholder="Username" />
+            <input type="password" id="password" placeholder="Password" />
+            <button class="forgot-password" id="forgotPasswordBtn">
+              Forgot Password?
+            </button>
+            <button id="login-button">Login</button>
+          </div>
+        </div>
+
+        <div class="register" id="register_box" style="display: none">
+          <div class="input_box">
+            <input type="text" id="reg_username" placeholder="Username" />
+            <input type="password" id="reg_password" placeholder="Password" />
+            <button id="register-button">Ro'yxatdan o'tish</button>
+          </div>
+        </div>
+
+        <div id="settingsModal" class="modal" style="display: none">
+          <div class="settingsModel_box">
+            <div class="modal-content">
+              <div class="close_btn" id="backToServerBtn">
+                <i class="fa-solid fa-xmark"></i>
+              </div>
+              <h2>Sozlamalar</h2>
+              <div class="setting-item">
+                <label for="ramSlider"
+                  >Ajratilgan RAM: <span id="ramValue">4 GB</span></label
+                >
+                <input
+                  type="range"
+                  id="ramSlider"
+                  min="2"
+                  max="12"
+                  step="1"
+                  value="4"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="gamePathInput">O'yin fayllari joyi:</label>
+                <div style="display: flex; gap: 10px">
+                  <input type="text" id="gamePathInput" readonly />
+                  <button id="browseBtn">Tanlash</button>
+                </div>
+              </div>
+
+              <div class="setting-actions">
+                <button id="saveSettings">Saqlash</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="profil_box" id="profileSection" style="display: none"></div>
+      </div>
+
+      <aside class="bottom_bar">
+        <ul class="bar_list" id="serverList"></ul>
+      </aside>
+    </div>
+
+    <div id="loader" style="display: none">
+      <div class="spinner"></div>
+    </div>
+
+    <script src="renderer.js" defer></script>
+    <script src="http://unpkg.com/skinview3d/bundles/skinview3d.bundle.js"></script>
+
+    <script src="assets/js/skin3dview.js" defer></script>
+
+    <script>
+      function minimizeApp() {
+        window.electronAPI.minimize();
+      }
+
+      document
+        .getElementById("profileToggleBtn")
+        .addEventListener("click", () => {
+          document.getElementById("profileSection").style.display = "block";
+          document.getElementById("serverMainSection").style.display = "none";
+        });
+
+      document.getElementById("settingsBtn").addEventListener("click", () => {
+        document.getElementById("settingsModal").style.display = "block";
+        document.getElementById("profileSection").style.display = "none";
+      });
+
+      document.getElementById("registerBtn").addEventListener("click", () => {
+        document.getElementById("register_box").style.display = "flex";
+        document.getElementById("login_box").style.display = "none";
+      });
+    </script>
+  </body>
+</html>

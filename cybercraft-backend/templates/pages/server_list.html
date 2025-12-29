@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Server List{% endblock title %}
+{% block content %}
+<h1>Minecraft Servers</h1>
+<a class="btn btn-primary mb-3" href="{% url 'server-create' %}">Create New Server</a>
+<ul class="list-group">
+  {% for server in servers %}
+  <li class="list-group-item">
+    {{ server.name }} - {{ server.version }} - {{ server.ram }}MB - {% if server.is_running %}Running{% else %}Stopped{% endif %}
+  </li>
+  {% empty %}
+  <li class="list-group-item">No servers yet.</li>
+  {% endfor %}
+</ul>
+{% endblock content %}

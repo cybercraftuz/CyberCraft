@@ -1,0 +1,14 @@
+{
+  "name": "cybercraft-launcher",
+  "version": "0.1.0",
+  "main": "launcher/main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "dependencies": {
+    "minecraft-launcher-core": "^3.18.2"
+  },
+  "devDependencies": {
+    "electron": "^29.0.0"
+  }
+}

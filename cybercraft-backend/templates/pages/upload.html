@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="uz">
+  <head>
+    <meta charset="UTF-8" />
+    <title>JAR fayl yuklash</title>
+
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 30px;
+        background: #f6f6f6;
+      }
+
+      .container {
+        width: 450px;
+        background: white;
+        padding: 25px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        margin: auto;
+      }
+
+      .title {
+        font-size: 22px;
+        font-weight: bold;
+        margin-bottom: 20px;
+      }
+
+      #progressContainer {
+        width: 100%;
+        background: #ddd;
+        height: 22px;
+        border-radius: 8px;
+        overflow: hidden;
+        margin-top: 15px;
+        display: none;
+      }
+
+      #progressBar {
+        width: 0%;
+        height: 100%;
+        background: #4caf50;
+        transition: width 0.2s ease;
+      }
+
+      #status {
+        margin-top: 10px;
+        font-size: 16px;
+      }
+
+      .btn {
+        padding: 10px 16px;
+        background: #4caf50;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 15px;
+      }
+
+      .btn:hover {
+        background: #43a047;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="title">server.jar faylni yuklash</div>
+
+      <input type="file" id="fileInput" accept=".jar" class="btn" />
+      <br /><br />
+
+      <button class="btn" onclick="uploadJar()">Yuklash</button>
+
+      <div id="progressContainer">
+        <div id="progressBar"></div>
+      </div>
+
+      <div id="status"></div>
+    </div>
+
+    <script>
+      function uploadJar() {
+        let file = document.getElementById("fileInput").files[0];
+
+        if (!file) {
+          alert("Iltimos, .jar faylni tanlang!");
+          return;
+        }
+
+        document.getElementById("progressContainer").style.display = "block";
+
+        let formData = new FormData();
+        formData.append("file", file);
+
+        let xhr = new XMLHttpRequest();
+
+        xhr.upload.onprogress = function (event) {
+          if (event.lengthComputable) {
+            let percent = Math.round((event.loaded / event.total) * 100);
+            document.getElementById("progressBar").style.width = percent + "%";
+            document.getElementById("status").innerText = percent + "%";
+          }
+        };
+
+        xhr.onload = function () {
+          if (xhr.status === 200) {
+            document.getElementById("status").innerText = "Yuklandi!";
+            document.getElementById("progressBar").style.background = "#2196F3";
+          } else {
+            document.getElementById("status").innerText =
+              "Xatolik: " + xhr.responseText;
+            document.getElementById("progressBar").style.background = "red";
+          }
+        };
+
+        xhr.onerror = function () {
+          document.getElementById("status").innerText =
+            "Server bilan ulana olmadi!";
+          document.getElementById("progressBar").style.background = "red";
+        };
+
+        xhr.open("POST", "/upload-jar/");
+        xhr.send(formData);
+      }
+    </script>
+  </body>
+</html>
