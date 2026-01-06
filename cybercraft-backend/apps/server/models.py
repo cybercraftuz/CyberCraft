@@ -8,7 +8,6 @@ class Server(models.Model):
     name = models.CharField(max_length=255)
     server_image = models.ImageField(upload_to="server_image", blank=True)
     online_player = models.IntegerField(default=0)
-    ip_address = models.TextField(blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     repo = models.URLField(blank=True, null=True)
     version = models.CharField(max_length=20)

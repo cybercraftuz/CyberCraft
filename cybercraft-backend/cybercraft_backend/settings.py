@@ -20,6 +20,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "drf_yasg",
     "rest_framework",
     "rest_framework.authtoken",
     "channels",
@@ -53,10 +54,17 @@ ASGI_APPLICATION = "cybercraft_backend.asgi.application"
 
 CHANNEL_LAYERS = {
     "default": {
-        "BACKEND": os.environ.get("CHANNEL_BACKEND", "channels.layers.InMemoryChannelLayer"),
-        "CONFIG": {
-            "hosts": [os.environ.get("REDIS_URL", "redis://127.0.0.1:6379/0")],
-        } if os.environ.get("CHANNEL_BACKEND") == "channels_redis.core.RedisChannelLayer" else {},
+        "BACKEND": os.environ.get(
+            "CHANNEL_BACKEND", "channels.layers.InMemoryChannelLayer"
+        ),
+        "CONFIG": (
+            {
+                "hosts": [os.environ.get("REDIS_URL", "redis://127.0.0.1:6379/0")],
+            }
+            if os.environ.get("CHANNEL_BACKEND")
+            == "channels_redis.core.RedisChannelLayer"
+            else {}
+        ),
     },
 }
 
@@ -91,11 +99,18 @@ DATABASES = {
 
 CACHES = {
     "default": {
-        "BACKEND": os.environ.get("CACHE_BACKEND", "django.core.cache.backends.locmem.LocMemCache"),
+        "BACKEND": os.environ.get(
+            "CACHE_BACKEND", "django.core.cache.backends.locmem.LocMemCache"
+        ),
         "LOCATION": os.environ.get("REDIS_URL", "unique-progress"),
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-        } if os.environ.get("CACHE_BACKEND") == "django.core.cache.backends.redis.RedisCache" else {},
+        "OPTIONS": (
+            {
+                "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            }
+            if os.environ.get("CACHE_BACKEND")
+            == "django.core.cache.backends.redis.RedisCache"
+            else {}
+        ),
     }
 }
 

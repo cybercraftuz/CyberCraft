@@ -17,8 +17,6 @@ class ServerSerializer(serializers.ModelSerializer):
             "id",
             "name",
             "server_image",
-            "online_player",
-            "ip_address",
             "description",
             "repo",
             "version",

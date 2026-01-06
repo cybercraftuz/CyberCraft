@@ -9,4 +9,7 @@ router.register(r"", views.ServerViewSet, basename="server")
 
 urlpatterns = [
     path("", include(router.urls)),
+    path("create/", views.ServerCreateAPIView.as_view(), name="server-create"),
+    path("<int:pk>/control/<str:action>/", views.ServerControlAPIView.as_view(), name="server-control"),
+    path("<int:pk>/logs/", views.ServerLogsAPIView.as_view(), name="server-logs"),
 ]
