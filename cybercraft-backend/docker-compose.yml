@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: cybercraft
+      POSTGRES_USER: cybercraft
+      POSTGRES_PASSWORD: cybercraft_pass
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  backend:
+    build: .
+    environment:
+      DEBUG: "False"
+      SECRET_KEY: "your-production-secret-key-here"
+      ALLOWED_HOSTS: "localhost,127.0.0.1"
+      DB_ENGINE: "django.db.backends.postgresql"
+      DB_NAME: "cybercraft"
+      DB_USER: "cybercraft"
+      DB_PASSWORD: "cybercraft_pass"
+      DB_HOST: "db"
+      DB_PORT: "5432"
+      CHANNEL_BACKEND: "channels_redis.core.RedisChannelLayer"
+      REDIS_URL: "redis://redis:6379/0"
+      CACHE_BACKEND: "django.core.cache.backends.redis.RedisCache"
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - ./server_files:/app/server_files
+      - ./media:/app/media
+      - ./logs:/app/logs
+      - ./backups:/app/backups
+
+volumes:
+  postgres_data:

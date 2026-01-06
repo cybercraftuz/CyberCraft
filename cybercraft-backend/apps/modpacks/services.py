@@ -5,9 +5,9 @@ from pathlib import Path
 ALLOWED_DIRS = ["mods", "resourcepacks", "shaderpacks"]
 
 
-def sha1(file: Path):
+def sha1(path: Path):
     h = hashlib.sha1()
-    with open(file, "rb") as f:
+    with path.open("rb") as f:
         for chunk in iter(lambda: f.read(8192), b""):
             h.update(chunk)
     return h.hexdigest()
@@ -18,11 +18,11 @@ def generate_manifest(modpack):
     files = []
 
     for folder in ALLOWED_DIRS:
-        dir_path = base / folder
-        if not dir_path.exists():
+        d = base / folder
+        if not d.exists():
             continue
 
-        for f in dir_path.rglob("*"):
+        for f in d.rglob("*"):
             if f.is_file():
                 files.append(
                     {
@@ -33,12 +33,14 @@ def generate_manifest(modpack):
                 )
 
     manifest = {
+        "name": modpack.name,
         "minecraft": modpack.mc_version,
         "loader": modpack.loader,
         "files": files,
     }
 
-    with open(base / "manifest.json", "w", encoding="utf-8") as fp:
-        json.dump(manifest, fp, indent=2)
+    (base / "manifest.json").write_text(
+        json.dumps(manifest, indent=2), encoding="utf-8"
+    )
 
     return manifest

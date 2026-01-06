@@ -201,40 +201,50 @@ def server_create_async(request):
 
 @csrf_exempt
 def server_start(request, pk):
-    srv = get_object_or_404(Server, pk=pk)
+    try:
+        srv = get_object_or_404(Server, pk=pk)
 
-    if srv.is_running:
-        return JsonResponse({"error": "Server already running"}, status=400)
+        if srv.is_running:
+            return JsonResponse({"error": "Server already running"}, status=400)
 
-    jars = list(Path(srv.path).glob("*.jar"))
-    if not jars:
-        return JsonResponse({"error": "Server jar not found"}, status=500)
+        jars = list(Path(srv.path).glob("*.jar"))
+        if not jars:
+            return JsonResponse({"error": "Server jar not found"}, status=500)
 
-    pid = restart_with_fixed_port(jars[0], srv.ram, srv.id)
+        pid = restart_with_fixed_port(jars[0], srv.ram, srv.id)
 
-    srv.pid = pid
-    srv.is_running = True
-    srv.save()
+        srv.pid = pid
+        srv.is_running = True
+        srv.save()
 
-    return JsonResponse({"status": "started"})
+        logger.info(f"Server {srv.name} started with PID {pid}")
+        return JsonResponse({"status": "started"})
+    except Exception as e:
+        logger.exception(f"Failed to start server {pk}")
+        return JsonResponse({"error": "Internal server error"}, status=500)
 
 
 @csrf_exempt
 def server_stop(request, pk):
-    srv = get_object_or_404(Server, pk=pk)
+    try:
+        srv = get_object_or_404(Server, pk=pk)
 
-    if not srv.is_running or not srv.pid:
-        return JsonResponse({"error": "Server not running"}, status=400)
+        if not srv.is_running or not srv.pid:
+            return JsonResponse({"error": "Server not running"}, status=400)
 
-    terminate_process(srv.pid)
+        terminate_process(srv.pid)
 
-    srv.pid = None
-    srv.is_running = False
-    srv.save()
+        srv.pid = None
+        srv.is_running = False
+        srv.save()
 
-    ws_log(srv.id, "[Server] Stopped")
+        ws_log(srv.id, "[Server] Stopped")
+        logger.info(f"Server {srv.name} stopped")
 
-    return JsonResponse({"status": "stopped"})
+        return JsonResponse({"status": "stopped"})
+    except Exception as e:
+        logger.exception(f"Failed to stop server {pk}")
+        return JsonResponse({"error": "Internal server error"}, status=500)
 
 
 def server_logs(request, pk):

@@ -12,21 +12,19 @@ class Server(models.Model):
     description = models.TextField(blank=True, null=True)
     repo = models.URLField(blank=True, null=True)
     version = models.CharField(max_length=20)
+    loader = models.CharField(max_length=20, default='vanilla')
     ram = models.IntegerField(default=1024)
-    port = models.IntegerField(unique=True, default=25565)
+    port = models.IntegerField(unique=True)
     modpack = models.ForeignKey(
-        ModPack, on_delete=models.PROTECT, related_name="servers", null=True, blank=True
+        ModPack, on_delete=models.PROTECT, related_name="servers"
     )
     is_online = models.BooleanField(default=False)
     path = models.CharField(max_length=500)
     is_running = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
     pid = models.IntegerField(null=True, blank=True)
 
-    def save(self, *args, **kwargs):
-        self.updated_at = models.DateTimeField(auto_now=True)
-        super().save(*args, **kwargs)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.name

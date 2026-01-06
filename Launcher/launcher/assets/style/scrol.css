@@ -1,12 +1,9 @@
-/* Scrollbarga o‘lcham bering, lekin border ishlatmasdan */
 .scrolbar::-webkit-scrollbar {
   width: 18px;
 }
 
 .scrolbar::-webkit-scrollbar-track {
-  /* background-color: #001f2e; */
   border-radius: 10px;
-  /* border: 10px solid transparent; */
 }
 
 .scrolbar::-webkit-scrollbar-thumb {
@@ -35,9 +32,7 @@
 }
 
 .server_image::-webkit-scrollbar-track {
-  /* background-color: #001f2e; */
   border-radius: 10px;
-  /* border: 10px solid transparent; */
 }
 
 .server_image::-webkit-scrollbar-thumb {
